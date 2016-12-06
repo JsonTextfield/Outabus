@@ -1,8 +1,12 @@
 package com.textfield.json.outabus;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -57,17 +61,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
         if (type.equals("stop")) {
-            Toast.makeText(this, "Showing 10 closest stops" , Toast.LENGTH_LONG).show();
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Toast.makeText(this, "Showing 20 closest stops", Toast.LENGTH_LONG).show();
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                super.onBackPressed();
+            }
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             double lat = location.getLatitude();
             double lng = location.getLongitude();
             Collections.sort(stops, new SortByDistance(lat, lng));
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 20; i++) {
                 LatLng point = new LatLng(stops.get(i).getLat(), stops.get(i).getLng());
                 Marker marker = mMap.addMarker(new MarkerOptions().position(point).title(stops.get(i).getName()));
 
@@ -91,15 +100,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         final LatLngBounds bounds = builder.build();
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
 
-        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
 
             @Override
-            public void onCameraChange(CameraPosition arg0) {
-                // Move camera.
+            public void onCameraMove() {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-                // Remove listener to prevent position reset on camera move.
-                mMap.setOnCameraChangeListener(null);
+                mMap.setOnCameraMoveListener(null);
             }
         });
 
