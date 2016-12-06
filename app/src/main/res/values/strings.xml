@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Outabus</string>
+    <array name="main">
+        <item>Buses</item>
+        <item>Stops</item>
+        <item>Favourites</item>
+    </array>
+
+    <string name="buses">Buses</string>
+    <string name="stops">Stops</string>
+    <string name="favs">Favourites</string>
+
+    <string name="hint">Filter</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="northbound">Northbound</string>
+    <string name="southbound">Southbound</string>
+    <string name="eastbound">Eastbound</string>
+    <string name="westbound">Westbound</string>
+</resources>

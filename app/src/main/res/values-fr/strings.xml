@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="main">
+        <item>Autobus</item>
+        <item>Arrêts</item>
+        <item>Favoris</item>
+
+    </array>
+
+    <string name="buses">Autobus</string>
+    <string name="stops">Arrêts</string>
+    <string name="favs">Favoris</string>
+
+    <string name="hint">Filtre</string>
+    <string name="northbound">Nord</string>
+    <string name="southbound">Sud</string>
+    <string name="eastbound">Est</string>
+    <string name="westbound">Ouest</string>
+</resources>
