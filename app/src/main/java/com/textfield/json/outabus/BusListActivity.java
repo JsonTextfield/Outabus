@@ -3,8 +3,11 @@ package com.textfield.json.outabus;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,13 +36,11 @@ import java.util.HashMap;
 /**
  * Created by Jason on 19/04/2016.
  */
-public class BusListActivity extends AppCompatActivity {
+public class BusListActivity extends GenericActivity {
+    BusAdapter arrayAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.generic_layout);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         DB mDbHelper = new DB(this);
 
@@ -131,7 +132,7 @@ public class BusListActivity extends AppCompatActivity {
             }
         }
         mDbHelper.close();
-        final BusAdapter arrayAdapter = new BusAdapter(this, list);
+        arrayAdapter = new BusAdapter(this, list);
 
         Collections.sort(list, new Comparator<Bus>() {
             @Override
@@ -143,25 +144,32 @@ public class BusListActivity extends AppCompatActivity {
             }
         });
 
-        ListView listView = ((ListView) findViewById(R.id.list));
         listView.setAdapter(arrayAdapter);
 
-
-        final EditText editText = (EditText) findViewById(R.id.filter);
-        editText.addTextChangedListener(new MyTextWatcher(arrayAdapter));
-        ImageButton imageButton = (ImageButton) findViewById(R.id.clearBtn);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText("");
-            }
-        });
     }
 
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_buslist, menu);
+        getMenuInflater().inflate(R.menu.menu_bus, menu);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.searchView));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (TextUtils.isEmpty(newText)) {
+                    arrayAdapter.getFilter().filter("");
+                    //listView.clearTextFilter();
+                } else {
+                    arrayAdapter.getFilter().filter(newText);
+                }
+                return true;
+            }
+        });
+
         return true;
     }
 

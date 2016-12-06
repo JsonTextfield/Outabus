@@ -7,8 +7,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,17 +41,15 @@ import java.util.LinkedHashSet;
 /**
  * Created by Jason on 19/04/2016.
  */
-public class StopListActivity extends AppCompatActivity {
+public class StopListActivity extends GenericActivity {
+    StopAdapter arrayAdapter;
     double lat, lng;
     ArrayList<Stop> list = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.generic_layout);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getString(R.string.stops));
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -67,7 +68,7 @@ public class StopListActivity extends AppCompatActivity {
                     JSONArray buses = jsonObject.getJSONArray("buses");
                     for (int i = 0; i < buses.length(); i++) {
                         JSONObject obj = buses.getJSONObject(i);
-                        busList.add(new Bus(obj.getString("routenum"),obj.getString("route_id"),obj.getString("destination"), obj.getInt("direction")));
+                        busList.add(new Bus(obj.getString("routenum"), obj.getString("route_id"), obj.getString("destination"), obj.getInt("direction")));
                     }
                     list.add(new Stop(jsonObject.getString("stop_id"),
                             jsonObject.getString("name"),
@@ -122,10 +123,9 @@ public class StopListActivity extends AppCompatActivity {
                     bus.put("route_id", b.getId());
                     bus.put("direction", b.getDirection());
                     bus.put("destination", b.getDestination());
-                    try{
+                    try {
                         stops.get(s.getId()).getJSONArray("buses");
-                    }
-                    catch (JSONException e){
+                    } catch (JSONException e) {
                         stops.get(s.getId()).put("buses", new JSONArray());
                     }
 
@@ -170,26 +170,9 @@ public class StopListActivity extends AppCompatActivity {
             }
         });
 
-        StopAdapter arrayAdapter = new StopAdapter(this, list);
-        ListView listView = ((ListView) findViewById(R.id.list));
+        arrayAdapter = new StopAdapter(this, list);
         listView.setAdapter(arrayAdapter);
 
-        final EditText editText = (EditText) findViewById(R.id.filter);
-        editText.addTextChangedListener(new MyTextWatcher(arrayAdapter));
-        ImageButton imageButton = (ImageButton) findViewById(R.id.clearBtn);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText("");
-            }
-        });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_stoplist, menu);
-        return true;
     }
 
     @Override
@@ -202,9 +185,8 @@ public class StopListActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == android.R.id.home) {
             super.onBackPressed();
-
         }
-        if (id == R.id.smap) {
+        if (id == R.id.map) {
             Bundle b = new Bundle();
             System.out.println(list.size());
             b.putParcelableArrayList("stops", new ArrayList<Stop>(list.subList(0, 50)));
@@ -215,5 +197,31 @@ public class StopListActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_bus, menu);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.searchView));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (TextUtils.isEmpty(newText)) {
+                    arrayAdapter.getFilter().filter("");
+                    //listView.clearTextFilter();
+                } else {
+                    arrayAdapter.getFilter().filter(newText);
+                }
+                return true;
+            }
+        });
+
+        return true;
     }
 }

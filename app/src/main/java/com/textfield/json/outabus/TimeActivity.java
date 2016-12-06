@@ -17,15 +17,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class TimeActivity extends AppCompatActivity {
+public class TimeActivity extends GenericActivity {
     TimeAdapter arrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         DB mDbHelper = new DB(this);
         Bundle b = getIntent().getExtras();
@@ -60,28 +57,29 @@ public class TimeActivity extends AppCompatActivity {
         }
         mDbHelper.open();
         Cursor cursor = null;
-        try{
-        if (formatter.parse(time).getTime() >= 6.48e+7) {
-            cursor = mDbHelper.runQuery("select arrival,routenum,destination from times natural join trips natural join routes where stop_id = '"
-                    + b.getString("stop")
-                    + "' and datetime(arrival) > datetime('" + time + "') and datetime(arrival) < datetime('" + limit + "', '+24 hours')"
-                    + "and trip_id like ('%"+day+"%') and ("
-                    + routes
-                    + "') group by arrival order by datetime(arrival) asc;");
-            //cursor = mDbHelper.runQuery("select arrival,routenum,destination from times natural join trips natural join routes where stop_id = '"
-            //        + b.getString("stop")+ "' and (" + routes + "') group by arrival order by datetime(arrival) asc;");
-        } else {
-            cursor = mDbHelper.runQuery("select arrival,routenum,destination from times natural join trips natural join routes where stop_id = '"
-                    + b.getString("stop")
-                    + "' and datetime(arrival) > datetime('" + time + "') and datetime(arrival) < datetime('" + limit + "')"
-                    + "and trip_id like ('%"+day+"%') and ("
-                    + routes
-                    + "') group by arrival order by datetime(arrival) asc;");
-            //cursor = mDbHelper.runQuery("select arrival,routenum,destination from times natural join trips natural join routes where stop_id = '"
-            //        + b.getString("stop")+ "' and (" + routes + "') group by arrival order by datetime(arrival) asc;");
+        try {
+            if (formatter.parse(time).getTime() >= 6.48e+7) {
+                cursor = mDbHelper.runQuery("select arrival,routenum,destination from times natural join trips natural join routes where stop_id = '"
+                        + b.getString("stop")
+                        + "' and datetime(arrival) > datetime('" + time + "') and datetime(arrival) < datetime('" + limit + "', '+24 hours')"
+                        + "and trip_id like ('%" + day + "%') and ("
+                        + routes
+                        + "') group by arrival order by datetime(arrival) asc;");
+                //cursor = mDbHelper.runQuery("select arrival,routenum,destination from times natural join trips natural join routes where stop_id = '"
+                //        + b.getString("stop")+ "' and (" + routes + "') group by arrival order by datetime(arrival) asc;");
+            } else {
+                cursor = mDbHelper.runQuery("select arrival,routenum,destination from times natural join trips natural join routes where stop_id = '"
+                        + b.getString("stop")
+                        + "' and datetime(arrival) > datetime('" + time + "') and datetime(arrival) < datetime('" + limit + "')"
+                        + "and trip_id like ('%" + day + "%') and ("
+                        + routes
+                        + "') group by arrival order by datetime(arrival) asc;");
+                //cursor = mDbHelper.runQuery("select arrival,routenum,destination from times natural join trips natural join routes where stop_id = '"
+                //        + b.getString("stop")+ "' and (" + routes + "') group by arrival order by datetime(arrival) asc;");
 
-        }}
-        catch (ParseException e){}
+            }
+        } catch (ParseException e) {
+        }
         ArrayList<String> list = new ArrayList<>();
 
         do {
@@ -92,7 +90,7 @@ public class TimeActivity extends AppCompatActivity {
         mDbHelper.close();
 
         arrayAdapter = new TimeAdapter(this, list);
-        ((ListView) findViewById(R.id.list)).setAdapter(arrayAdapter);
+        listView.setAdapter(arrayAdapter);
 
     }
 

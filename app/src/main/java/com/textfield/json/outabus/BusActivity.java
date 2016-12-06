@@ -17,17 +17,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-public class BusActivity extends AppCompatActivity {
+public class BusActivity extends GenericActivity {
     ArrayList<Stop> list = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.generic_layout);
 
         Bundle b = getIntent().getExtras();
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(b.getString("number") + " " + b.getString("name"));
 
         DB mDbHelper = new DB(this);
@@ -84,19 +81,8 @@ public class BusActivity extends AppCompatActivity {
         }
 
         StopAdapter arrayAdapter = new StopAdapter(this, list);
-        ListView myListView = ((ListView) findViewById(R.id.list));
-        myListView.setAdapter(arrayAdapter);
+        listView.setAdapter(arrayAdapter);
 
-        final EditText editText = (EditText) findViewById(R.id.filter);
-        editText.addTextChangedListener(new MyTextWatcher(arrayAdapter));
-
-        ImageButton imageButton = (ImageButton) findViewById(R.id.clearBtn);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText("");
-            }
-        });
     }
 
     @Override
