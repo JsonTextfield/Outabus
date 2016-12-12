@@ -201,7 +201,7 @@ public class StopListActivity extends GenericActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_bus, menu);
+        getMenuInflater().inflate(R.menu.menu_stop, menu);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.searchView));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
