@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +30,15 @@ public class StopAdapter extends ArrayAdapter<Stop> {
     private static class ViewHolder {
         public TextView routenum;
         public TextView buses;
-        public LinearLayout ll;
+        public View ll;
+        public TextView stopId;
     }
 
+    @Nullable
+    @Override
+    public Stop getItem(int position) {
+        return data.get(position);
+    }
 
     public StopAdapter(Context context, ArrayList<Stop> data) {
         super(context, 0, data);
@@ -54,15 +61,16 @@ public class StopAdapter extends ArrayAdapter<Stop> {
 
             viewHolder.routenum = (TextView) convertView.findViewById(R.id.listtext);
             viewHolder.buses = (TextView) convertView.findViewById(R.id.textView);
-            viewHolder.ll = (LinearLayout) convertView.findViewById(R.id.ll);
+            viewHolder.ll = convertView.findViewById(R.id.ll);
+            viewHolder.stopId = (TextView) convertView.findViewById(R.id.stop_id);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.routenum.setText(data.get(position).getName());
+        viewHolder.routenum.setText(getItem(position).getName());
         String buses = "";
-
-        for (Bus x : data.get(position).getBuses()) {
+        viewHolder.stopId.setText(getItem(position).getId());
+        for (Bus x : getItem(position).getBuses()) {
             buses += x.getRouteNumber() + "   ";
         }
         viewHolder.buses.setText(buses);
@@ -73,31 +81,36 @@ public class StopAdapter extends ArrayAdapter<Stop> {
                 final Bundle b = new Bundle();
 
                 final ArrayList<String> items = new ArrayList<String>();
-                for (int x = 0; x < data.get(position).getBuses().size(); x++) {
-                    items.add(data.get(position).getBuses().get(x).toString());
+                for (int x = 0; x < getItem(position).getBuses().size(); x++) {
+                    items.add(getItem(position).getBuses().get(x).toString());
                 }
                 final HashSet<Bus> buses = new HashSet<Bus>();
                 AlertDialog dialog = new AlertDialog.Builder(getContext())
-                        .setTitle(data.get(position).getName())
+                        .setTitle(getItem(position).getName())
                         .setMultiChoiceItems(items.toArray(new String[0]), null, new DialogInterface.OnMultiChoiceClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int indexSelected, boolean isChecked) {
                                 if (isChecked) {
-                                    buses.add(data.get(position).getBuses().get(indexSelected));
+                                    buses.add(getItem(position).getBuses().get(indexSelected));
                                     System.out.println(buses);
                                     // If the user checked the item, add it to the selected items
 
-                                } else if (buses.contains(data.get(position).getBuses().get(indexSelected))) {
-                                    buses.remove(data.get(position).getBuses().get(indexSelected));
+                                } else if (buses.contains(getItem(position).getBuses().get(indexSelected))) {
+                                    buses.remove(getItem(position).getBuses().get(indexSelected));
                                 }
+                            }
+                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                
                             }
                         }).setPositiveButton("Done", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 if (buses.size() > 0) {
                                     b.putParcelableArrayList("buses", new ArrayList<Bus>(buses));
-                                    b.putString("stop", data.get(position).getId());
-                                    b.putString("stopname", data.get(position).getName());
+                                    b.putString("stop", getItem(position).getId());
+                                    b.putString("stopname", getItem(position).getName());
                                     i.putExtras(b);
                                     getContext().startActivity(i);
                                 }
@@ -129,7 +142,7 @@ public class StopAdapter extends ArrayAdapter<Stop> {
                 ArrayList<Stop> filteredResults = new ArrayList<>();
 
                 for (Stop s : wholeList) {
-                    if (s.getName().contains(constraint.toString().toUpperCase())) {
+                    if (s.getName().contains(constraint.toString().toUpperCase()) || s.getId().contains(constraint.toString())) {
                         filteredResults.add(s);
                     }
                 }

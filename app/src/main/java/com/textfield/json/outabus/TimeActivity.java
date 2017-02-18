@@ -20,10 +20,7 @@ import java.util.Date;
 public class TimeActivity extends GenericActivity {
     TimeAdapter arrayAdapter;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public void refresh() {
         DB mDbHelper = new DB(this);
         Bundle b = getIntent().getExtras();
 
@@ -91,7 +88,12 @@ public class TimeActivity extends GenericActivity {
 
         arrayAdapter = new TimeAdapter(this, list);
         listView.setAdapter(arrayAdapter);
+    }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        refresh();
     }
 
     @Override
@@ -114,7 +116,7 @@ public class TimeActivity extends GenericActivity {
 
         }
         if (id == R.id.refresh) {
-            arrayAdapter.notifyDataSetChanged();
+            refresh();
         }
         return super.onOptionsItemSelected(item);
     }
