@@ -112,16 +112,17 @@ public class BusActivity extends GenericActivity {
             DB mDbHelper = new DB(this);
             Bus b = getIntent().getExtras().getParcelable("bus");
             mDbHelper.open();
-            Cursor cursor = mDbHelper.runQuery("select * from routes join trips on trips.route_id = routes.route_id where trips.route_id = " + b.getId() + " and direction = " + ((b.getDirection() + 1) % 2) + " group by routenum, direction order by routenum;");
+            Cursor cursor = mDbHelper.runQuery("select * from routes join trips on trips.route_id = routes.route_id where trips.route_id = \"" + b.getId() + "\" and direction = " + ((b.getDirection() + 1) % 2) + " group by routenum, direction order by routenum;");
             Bus autobus = new Bus(cursor.getString(cursor.getColumnIndex("routenum")), cursor.getString(cursor.getColumnIndex("route_id")),
                     cursor.getString(cursor.getColumnIndex("destination")), cursor.getInt(cursor.getColumnIndex("direction")));
-
+            System.out.println(autobus);
             Bundle bundle = new Bundle();
             bundle.putParcelable("bus", autobus);
 
             Intent i = new Intent(this, BusActivity.class);
             i.putExtras(bundle);
             startActivity(i);
+            finish();
 
 
         }

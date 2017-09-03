@@ -9,13 +9,14 @@
         android:id="@+id/destination"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/number"
+        android:layout_toRightOf="@+id/number"
         android:gravity="left"
+        android:paddingTop="10dp"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/number"
-        android:layout_toEndOf="@+id/number"
-        android:paddingTop="10dp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/number"
@@ -23,20 +24,21 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:padding="10dp"
-        android:text="000"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_marginLeft="30dp"
-        android:gravity="center" />
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="000"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
+        android:id="@+id/bound"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
-        android:id="@+id/bound"
-        android:layout_below="@id/destination"
         android:layout_alignLeft="@+id/destination"
         android:layout_alignStart="@+id/destination"
-        android:paddingLeft="5dp" />
+        android:layout_below="@id/destination"
+        android:paddingLeft="5dp"
+        android:text="Small Text"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="12sp" />
 </RelativeLayout>
