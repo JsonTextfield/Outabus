@@ -24,6 +24,7 @@ import java.util.ArrayList;
 public class BusAdapter extends ArrayAdapter<Bus> {
     private ArrayList<Bus> data;
     private ArrayList<Bus> wholeList;
+
     private static class ViewHolder {
         public TextView dest;
         public TextView bound;
@@ -61,10 +62,7 @@ public class BusAdapter extends ArrayAdapter<Bus> {
             @Override
             public void onClick(View v) {
                 Bundle b = new Bundle();
-                b.putString("id", data.get(position).getId());
-                b.putString("name", data.get(position).getDestination());
-                b.putInt("direction", data.get(position).getDirection());
-                b.putString("number", data.get(position).getRouteNumber());
+                b.putParcelable("bus", data.get(position));
                 Intent i = new Intent(getContext(), BusActivity.class);
                 i.putExtras(b);
                 getContext().startActivity(i);

@@ -2,19 +2,11 @@ package com.textfield.json.outabus;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
 
 import com.textfield.json.outabus.util.DB;
 
@@ -149,7 +141,7 @@ public class BusListActivity extends GenericActivity {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_bus, menu);
+        getMenuInflater().inflate(R.menu.menu_bus_list, menu);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.searchView));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

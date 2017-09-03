@@ -20,9 +20,7 @@ import java.util.LinkedHashSet;
 public class BusActivity extends GenericActivity {
     ArrayList<Stop> list = new ArrayList<>();
 
-
     public void setup() {
-        Bundle b = getIntent().getExtras();
         Bus bus = getIntent().getExtras().getParcelable("bus");
         getSupportActionBar().setTitle(bus.toString());
         DB mDbHelper = new DB(this);
@@ -30,8 +28,8 @@ public class BusActivity extends GenericActivity {
         mDbHelper.open();
 
         Cursor cursor = mDbHelper.runQuery("select * from stops natural join busroutes where route_id = '"
-                + b.getString("id") + "' and direction = "
-                + b.getInt("direction")
+                + bus.getId() + "' and direction = "
+                + bus.getDirection()
                 + " group by stop_id order by stop_number,stop_id;");
 
         LinkedHashMap<Stop, LinkedHashSet<Bus>> results = new LinkedHashMap<>();
@@ -87,8 +85,6 @@ public class BusActivity extends GenericActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setup();
 
     }
@@ -114,17 +110,14 @@ public class BusActivity extends GenericActivity {
         }
         if (id == R.id.switch_dir) {
             DB mDbHelper = new DB(this);
-            Bundle b = getIntent().getExtras();
+            Bus b = getIntent().getExtras().getParcelable("bus");
             mDbHelper.open();
-            Cursor cursor = mDbHelper.runQuery("select * from routes join trips on trips.route_id = routes.route_id where trips.route_id = " + b.getString("id") + " and direction = " + ((b.getInt("direction") + 1) % 2) + " group by routenum, direction order by routenum;");
+            Cursor cursor = mDbHelper.runQuery("select * from routes join trips on trips.route_id = routes.route_id where trips.route_id = " + b.getId() + " and direction = " + ((b.getDirection() + 1) % 2) + " group by routenum, direction order by routenum;");
             Bus autobus = new Bus(cursor.getString(cursor.getColumnIndex("routenum")), cursor.getString(cursor.getColumnIndex("route_id")),
                     cursor.getString(cursor.getColumnIndex("destination")), cursor.getInt(cursor.getColumnIndex("direction")));
 
             Bundle bundle = new Bundle();
-            bundle.putString("number", autobus.getRouteNumber());
-            bundle.putInt("direction", autobus.getDirection());
-            bundle.putString("name", autobus.getDestination());
-            bundle.putString("id", autobus.getId());
+            bundle.putParcelable("bus", autobus);
 
             Intent i = new Intent(this, BusActivity.class);
             i.putExtras(bundle);
