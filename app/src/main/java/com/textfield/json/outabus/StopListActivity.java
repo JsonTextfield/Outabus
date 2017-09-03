@@ -53,6 +53,9 @@ public class StopListActivity extends GenericActivity {
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if(location == null){
+            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
         lat = location.getLatitude();
         lng = location.getLongitude();
 

@@ -7,6 +7,11 @@
         android:title="Map"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/switch_dir"
+        android:icon="@drawable/ic_swap_horiz_white_24dp"
+        android:title="Switch Directions"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/searchView"
         android:icon="@drawable/ic_search_white_24dp"
         android:title="Search"

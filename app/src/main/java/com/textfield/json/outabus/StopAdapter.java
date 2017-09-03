@@ -102,7 +102,7 @@ public class StopAdapter extends ArrayAdapter<Stop> {
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                
+
                             }
                         }).setPositiveButton("Done", new DialogInterface.OnClickListener() {
                             @Override

@@ -20,14 +20,13 @@ import java.util.LinkedHashSet;
 public class BusActivity extends GenericActivity {
     ArrayList<Stop> list = new ArrayList<>();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
+    public void setup() {
         Bundle b = getIntent().getExtras();
-        getSupportActionBar().setTitle(b.getString("number") + " " + b.getString("name"));
-
+        Bus bus = getIntent().getExtras().getParcelable("bus");
+        getSupportActionBar().setTitle(bus.toString());
         DB mDbHelper = new DB(this);
+
         mDbHelper.open();
 
         Cursor cursor = mDbHelper.runQuery("select * from stops natural join busroutes where route_id = '"
@@ -86,6 +85,15 @@ public class BusActivity extends GenericActivity {
     }
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+        setup();
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_bus, menu);
@@ -102,6 +110,26 @@ public class BusActivity extends GenericActivity {
         //noinspection SimplifiableIfStatement
         if (id == android.R.id.home) {
             super.onBackPressed();
+
+        }
+        if (id == R.id.switch_dir) {
+            DB mDbHelper = new DB(this);
+            Bundle b = getIntent().getExtras();
+            mDbHelper.open();
+            Cursor cursor = mDbHelper.runQuery("select * from routes join trips on trips.route_id = routes.route_id where trips.route_id = " + b.getString("id") + " and direction = " + ((b.getInt("direction") + 1) % 2) + " group by routenum, direction order by routenum;");
+            Bus autobus = new Bus(cursor.getString(cursor.getColumnIndex("routenum")), cursor.getString(cursor.getColumnIndex("route_id")),
+                    cursor.getString(cursor.getColumnIndex("destination")), cursor.getInt(cursor.getColumnIndex("direction")));
+
+            Bundle bundle = new Bundle();
+            bundle.putString("number", autobus.getRouteNumber());
+            bundle.putInt("direction", autobus.getDirection());
+            bundle.putString("name", autobus.getDestination());
+            bundle.putString("id", autobus.getId());
+
+            Intent i = new Intent(this, BusActivity.class);
+            i.putExtras(bundle);
+            startActivity(i);
+
 
         }
         if (id == R.id.map) {
