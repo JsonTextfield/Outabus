@@ -1,12 +1,11 @@
 package com.textfield.json.outabus;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class GenericActivity extends AppCompatActivity {
     protected ListView listView;
@@ -25,6 +24,13 @@ public class GenericActivity extends AppCompatActivity {
 
     public void showProgressBar(boolean show) {
 
+    }
+
+    public void setSmallTitle(String text) {
+        toolbar.setTitle("");
+        TextView title = (TextView) toolbar.findViewById(R.id.textView);
+        title.setText(text);
+        setSupportActionBar(toolbar);
     }
 
     @Override

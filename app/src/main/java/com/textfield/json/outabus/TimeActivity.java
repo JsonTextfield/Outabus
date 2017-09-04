@@ -24,7 +24,7 @@ public class TimeActivity extends GenericActivity {
         DB mDbHelper = new DB(this);
         Bundle b = getIntent().getExtras();
 
-        getSupportActionBar().setTitle(b.getString("stopname"));
+        setSmallTitle(b.getString("stopname"));
 
         Calendar calendar = Calendar.getInstance();
         String day = "";
@@ -35,7 +35,6 @@ public class TimeActivity extends GenericActivity {
         } else {
             day = "Semaine";
         }
-        System.out.println(day);
 
         DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
         long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
