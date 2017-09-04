@@ -3,26 +3,35 @@ package com.textfield.json.outabus;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
+import android.widget.TextView;
 
 import com.textfield.json.outabus.util.DB;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 
 public class BusActivity extends GenericActivity {
-    ArrayList<Stop> list = new ArrayList<>();
+    Bus bus;
+    ArrayList<Stop> stopList = new ArrayList<>();
 
-    public void setup() {
-        Bus bus = getIntent().getExtras().getParcelable("bus");
-        getSupportActionBar().setTitle(bus.toString());
+    public void setup(Bus bus) {
+        this.bus = bus;
+        stopList.clear();
+
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.generic_toolbar);
+        toolbar.setTitle("");
+        TextView title = (TextView) toolbar.findViewById(R.id.textView);
+        title.setText(bus.toString());
+        setSupportActionBar(toolbar);
+
+
+        //getSupportActionBar().setTitle(bus.toString());
         DB mDbHelper = new DB(this);
 
         mDbHelper.open();
@@ -43,7 +52,7 @@ public class BusActivity extends GenericActivity {
             if (results.get(s) == null) {
                 results.put(s, new LinkedHashSet<Bus>());
             }
-            list.add(s);
+            stopList.add(s);
         }
         while (cursor.moveToNext());
 
@@ -72,12 +81,12 @@ public class BusActivity extends GenericActivity {
         mDbHelper.close();
 
         for (Stop i : results2.keySet()) {
-            if (results2.get(i).size() == 0) list.remove(list.indexOf(i));
-            else list.get(list.indexOf(i)).buses = new ArrayList<>(results2.get(i));
+            if (results2.get(i).size() == 0) stopList.remove(stopList.indexOf(i));
+            else stopList.get(stopList.indexOf(i)).buses = new ArrayList<>(results2.get(i));
 
         }
 
-        StopAdapter arrayAdapter = new StopAdapter(this, list);
+        StopAdapter arrayAdapter = new StopAdapter(this, stopList);
         listView.setAdapter(arrayAdapter);
 
     }
@@ -85,7 +94,8 @@ public class BusActivity extends GenericActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setup();
+        this.bus = getIntent().getExtras().getParcelable("bus");
+        setup(bus);
 
     }
 
@@ -110,25 +120,20 @@ public class BusActivity extends GenericActivity {
         }
         if (id == R.id.switch_dir) {
             DB mDbHelper = new DB(this);
-            Bus b = getIntent().getExtras().getParcelable("bus");
             mDbHelper.open();
-            Cursor cursor = mDbHelper.runQuery("select * from routes join trips on trips.route_id = routes.route_id where trips.route_id = \"" + b.getId() + "\" and direction = " + ((b.getDirection() + 1) % 2) + " group by routenum, direction order by routenum;");
+            Cursor cursor = mDbHelper.runQuery("select * from routes join trips on trips.route_id = routes.route_id " +
+                    "where trips.route_id = \"" + bus.getId() + "\" and direction = " +
+                    ((bus.getDirection() + 1) % 2) + " group by routenum, direction order by routenum;");
             Bus autobus = new Bus(cursor.getString(cursor.getColumnIndex("routenum")), cursor.getString(cursor.getColumnIndex("route_id")),
                     cursor.getString(cursor.getColumnIndex("destination")), cursor.getInt(cursor.getColumnIndex("direction")));
             System.out.println(autobus);
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("bus", autobus);
-
-            Intent i = new Intent(this, BusActivity.class);
-            i.putExtras(bundle);
-            startActivity(i);
-            finish();
+            setup(autobus);
 
 
         }
         if (id == R.id.map) {
             Bundle b = new Bundle();
-            b.putParcelableArrayList("stops", list);
+            b.putParcelableArrayList("stops", stopList);
             b.putString("type", "bus");
             Intent i = new Intent(this, MapsActivity.class);
             i.putExtras(b);

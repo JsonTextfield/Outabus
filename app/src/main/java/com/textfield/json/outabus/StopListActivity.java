@@ -153,9 +153,9 @@ public class StopListActivity extends GenericActivity {
             } catch (IOException e) {
             }
         }
-        /*for(Stop stop : list){
+        /*for(Stop stop : stopList){
             if(stop.getBuses().size() == 0){
-                list.remove(stop);
+                stopList.remove(stop);
             }
         }*/
         Collections.sort(list, new Comparator<Stop>() {
