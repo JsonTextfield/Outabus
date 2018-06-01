@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,18 +21,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BusActivity"
+            android:name=".activities.BusActivity"
             android:screenOrientation="portrait" />
         <activity
             android:label="Buses"
-            android:name=".BusListActivity"
+            android:name=".activities.BusListActivity"
             android:screenOrientation="portrait" />
         <activity
             android:label="Stops"
-            android:name=".StopListActivity"
+            android:name=".activities.StopListActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".TimeActivity"
+            android:name=".activities.TimeActivity"
             android:screenOrientation="portrait" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -47,9 +47,9 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".activities.MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".GenericActivity" />
+        <activity android:name=".activities.GenericActivity" />
     </application>
 
 </manifest>
