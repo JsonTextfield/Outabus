@@ -11,7 +11,7 @@ import java.util.ArrayList
 /**
  * Created by Jason on 19/04/2016.
  */
-class Bus : Parcelable {
+class Bus : Parcelable, Comparable<Bus> {
     var direction: Int = 0
     var routeNumber = ""
     var id = ""
@@ -80,6 +80,12 @@ class Bus : Parcelable {
 
     override fun describeContents(): Int {
         return 0
+    }
+
+    override fun compareTo(other: Bus): Int {
+        val x = if (this.routeNumber == "OTrn") 0 else Integer.parseInt(this.routeNumber)
+        val y = if (other.routeNumber == "OTrn") 0 else Integer.parseInt(other.routeNumber)
+        return x.compareTo(y)
     }
 
     companion object CREATOR : Parcelable.Creator<Bus> {

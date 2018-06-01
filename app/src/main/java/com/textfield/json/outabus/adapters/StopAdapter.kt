@@ -23,8 +23,8 @@ import java.util.HashSet
  * Created by Jason on 20/09/2015.
  */
 class StopAdapter(context: Context, list: ArrayList<Stop>) : ArrayAdapter<Stop>(context, 0, list) {
-    private var data = list
     private val wholeList = list
+    private var data = wholeList
 
     private class ViewHolder {
         var routenum: TextView? = null
@@ -33,7 +33,7 @@ class StopAdapter(context: Context, list: ArrayList<Stop>) : ArrayAdapter<Stop>(
         var stopId: TextView? = null
     }
 
-    override fun getItem(position: Int): Stop? {
+    override fun getItem(position: Int): Stop {
         return data[position]
     }
 
@@ -57,36 +57,32 @@ class StopAdapter(context: Context, list: ArrayList<Stop>) : ArrayAdapter<Stop>(
         } else {
             viewHolder = convertView.tag as ViewHolder
         }
-        viewHolder.routenum!!.text = getItem(position)!!.name
-        viewHolder.stopId!!.text = getItem(position)!!.id
-        viewHolder.buses!!.text = getItem(position)!!.buses.joinToString(separator = "\t", transform = {it.routeNumber})
+        val stop = getItem(position)
+        viewHolder.routenum!!.text = stop.name
+        viewHolder.stopId!!.text = stop.id
+        viewHolder.buses!!.text = stop.buses.joinToString(separator = "\t", transform = {it.routeNumber})
 
         viewHolder.ll!!.setOnClickListener {
             val i = Intent(context, TimeActivity::class.java)
-            val b = Bundle()
 
             val items = ArrayList<String>()
-            for (x in 0 until getItem(position)!!.buses.size) {
-                items.add(getItem(position)!!.buses[x].toString())
+            for (x in stop.buses.indices) {
+                items.add(stop.buses[x].toString())
             }
             val buses = HashSet<Bus>()
             val dialog = AlertDialog.Builder(context)
-                    .setTitle(getItem(position)!!.name)
+                    .setTitle(stop.name)
                     .setMultiChoiceItems(items.toTypedArray(), null) { dialog, indexSelected, isChecked ->
                         if (isChecked) {
-                            buses.add(getItem(position)!!.buses[indexSelected])
-                            println(buses)
-                            // If the user checked the item, add it to the selected items
-
-                        } else if (buses.contains(getItem(position)!!.buses[indexSelected])) {
-                            buses.remove(getItem(position)!!.buses[indexSelected])
+                            buses.add(stop.buses[indexSelected])
+                        } else if (buses.contains(stop.buses[indexSelected])) {
+                            buses.remove(stop.buses[indexSelected])
                         }
                     }.setNegativeButton("Cancel") { dialogInterface, i -> }.setPositiveButton("Done") { dialog, id ->
-                        if (buses.size > 0) {
-                            b.putParcelableArrayList("buses", ArrayList(buses))
-                            b.putString("stop", getItem(position)!!.id)
-                            b.putString("stopname", getItem(position)!!.name)
-                            i.putExtras(b)
+                        if (buses.isNotEmpty()) {
+                            i.putParcelableArrayListExtra("buses", ArrayList(buses))
+                            i.putExtra("stop", stop.id)
+                            i.putExtra("stopname", stop.name)
                             context.startActivity(i)
                         }
                     }.create()
@@ -100,15 +96,13 @@ class StopAdapter(context: Context, list: ArrayList<Stop>) : ArrayAdapter<Stop>(
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun publishResults(constraint: CharSequence, results: Filter.FilterResults) {
-                //Log.d(Constants.TAG, "**** PUBLISHING RESULTS for: " + constraint);
                 data = results.values as ArrayList<Stop>
                 notifyDataSetChanged()
             }
 
             override fun performFiltering(constraint: CharSequence): Filter.FilterResults {
-                //Log.d(Constants.TAG, "**** PERFORM FILTERING for: " + constraint);
                 val filteredResults = wholeList.filter {
-                    (it.name.contains(constraint, true) || it.id.contains(constraint))
+                    it.name.contains(constraint, true) || it.id.contains(constraint)
                 }
 
                 val results = Filter.FilterResults()

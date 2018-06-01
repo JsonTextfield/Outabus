@@ -1,9 +1,7 @@
 package com.textfield.json.outabus.activities
 
 import android.os.Bundle
-import android.support.v4.view.MenuItemCompat
 import android.support.v7.widget.SearchView
-import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 
@@ -15,15 +13,12 @@ import com.textfield.json.outabus.util.DB
 import org.json.JSONException
 import org.json.JSONObject
 
-import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
-import java.io.FileReader
 import java.io.FileWriter
 import java.io.IOException
 import java.util.ArrayList
 import java.util.Calendar
-import java.util.Comparator
 import java.util.HashMap
 
 /**
@@ -49,13 +44,7 @@ class BusListActivity : GenericActivity() {
         val file = File(cacheDir, "buses")
         if (file.exists()) {
             try {
-                val bufferedReader = BufferedReader(FileReader(file))
-                var x: String
-                /*while ((x = bufferedReader.readLine()) != null) {
-                    val jsonObject = JSONObject(x)
-                    list.add(Bus(jsonObject))
-                }*/
-                bufferedReader.close()
+                file.inputStream().bufferedReader().use { list.add(Bus(JSONObject(it.readLine()))) }
             } catch (e: IOException) {
                 e.printStackTrace()
             } catch (e: JSONException) {
@@ -85,7 +74,7 @@ class BusListActivity : GenericActivity() {
             } while (cursor!!.moveToNext())
 
             for (b in list) {
-                cursor = mDbHelper.runQuery("select latitude,longitude from stops natural join busroutes where route_id = '" + b.id + "' and direction = " + b.direction + " order by stop_number asc;")
+                cursor = mDbHelper.runQuery("select latitude,longitude from stops natural join busroutes where route_id = '$b.id' and direction = $b.direction order by stop_number asc;")
 
                 cursor!!.moveToFirst()
                 val point1 = doubleArrayOf(Math.toRadians(cursor.getDouble(0)), Math.toRadians(cursor.getDouble(1)))
@@ -97,15 +86,15 @@ class BusListActivity : GenericActivity() {
                 val y = Math.sin(longDiff) * Math.cos(point2[0])
                 val x = Math.cos(point1[0]) * Math.sin(point2[0]) - Math.sin(point1[0]) * Math.cos(point2[0]) * Math.cos(longDiff)
 
-                val compass_bearing = (Math.toDegrees(Math.atan2(y, x)) + 360) % 360
+                val compassBearing = (Math.toDegrees(Math.atan2(y, x)) + 360) % 360
 
-                //System.out.println("bearing " + compass_bearing);
+                //System.out.println("bearing " + compassBearing);
                 b.bearing =
-                        if (compass_bearing >= 45 && compass_bearing < 135) {
+                        if (compassBearing >= 45 && compassBearing < 135) {
                             "Eastbound"
-                        } else if (compass_bearing >= 135 && compass_bearing < 225) {
+                        } else if (compassBearing >= 135 && compassBearing < 225) {
                             "Southbound"
-                        } else if (compass_bearing >= 225 && compass_bearing < 315) {
+                        } else if (compassBearing >= 225 && compassBearing < 315) {
                             "Westbound"
                         } else {
                             "Northbound"
@@ -128,35 +117,25 @@ class BusListActivity : GenericActivity() {
 
         }
         mDbHelper.close()
+        list.sort()
+
         arrayAdapter = BusAdapter(this, list)
-
-        list.sortWith(Comparator { lhs, rhs ->
-            val x = if (lhs.routeNumber == "OTrn") 0 else Integer.parseInt(lhs.routeNumber)
-            val y = if (rhs.routeNumber == "OTrn") 0 else Integer.parseInt(rhs.routeNumber)
-            x.compareTo(y)
-            //return (Integer.parseInt(lhs.getRouteNumber()) - Integer.parseInt(rhs.getRouteNumber())) % 2;
-        })
-
         listView.adapter = arrayAdapter
 
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_bus_list, menu)
-        val searchView = MenuItemCompat.getActionView(menu.findItem(R.id.searchView)) as SearchView
+        val searchView = menu.findItem(R.id.searchView).actionView as SearchView
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
+                searchView.clearFocus()
                 return false
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if (TextUtils.isEmpty(newText)) {
-                    arrayAdapter.filter.filter("")
-                    //listView.clearTextFilter();
-                } else {
-                    arrayAdapter.filter.filter(newText)
-                }
+                arrayAdapter.filter.filter(newText)
                 return true
             }
         })
@@ -165,16 +144,9 @@ class BusListActivity : GenericActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-
-
-        if (id == android.R.id.home) {
+        if (item.itemId == android.R.id.home) {
             finish()
         }
-
         return super.onOptionsItemSelected(item)
     }
 }
